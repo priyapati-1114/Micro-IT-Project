@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .quiz-container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 400px;
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    .btn {
+      display: block;
+      background: #007bff;
+      color: white;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      width: 100%;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .btn:hover {
+      background: #0056b3;
+    }
+    #next-btn {
+      margin-top: 20px;
+      background: #28a745;
+    }
+    #next-btn:hover {
+      background: #218838;
+    }
+  </style>
+</head>
+<body>
+
+<div class="quiz-container">
+  <h2 id="question">Question text</h2>
+  <div id="answer-buttons"></div>
+  <button id="next-btn" class="btn">Next</button>
+</div>
+
+<script>
+  const questions = [
+    {
+      question: "What is the capital of France?",
+      answers: [
+        { text: "Paris", correct: true },
+        { text: "Madrid", correct: false },
+        { text: "Berlin", correct: false },
+        { text: "Rome", correct: false }
+      ]
+    },
+    {
+      question: "What is 2 + 2?",
+      answers: [
+        { text: "3", correct: false },
+        { text: "4", correct: true },
+        { text: "5", correct: false },
+        { text: "22", correct: false }
+      ]
+    },
+    {
+      question: "Which language is used for web apps?",
+      answers: [
+        { text: "Python", correct: false },
+        { text: "JavaScript", correct: true },
+        { text: "C#", correct: false },
+        { text: "Java", correct: false }
+      ]
+    }
+  ];
+
+  const questionElement = document.getElementById("question");
+  const answerButtons = document.getElementById("answer-buttons");
+  const nextButton = document.getElementById("next-btn");
+
+  let currentQuestionIndex = 0;
+  let score = 0;
+
+  function startQuiz() {
+    currentQuestionIndex = 0;
+    score = 0;
+    nextButton.innerHTML = "Next";
+    showQuestion();
+  }
+
+  function showQuestion() {
+    resetState();
+    const currentQuestion = questions[currentQuestionIndex];
+    questionElement.innerHTML = currentQuestion.question;
+
+    currentQuestion.answers.forEach(answer => {
+      const button = document.createElement("button");
+      button.innerHTML = answer.text;
+      button.classList.add("btn");
+      if (answer.correct) {
+        button.dataset.correct = answer.correct;
+      }
+      button.addEventListener("click", selectAnswer);
+      answerButtons.appendChild(button);
+    });
+  }
+
+  function resetState() {
+    nextButton.style.display = "none";
+    while (answerButtons.firstChild) {
+      answerButtons.removeChild(answerButtons.firstChild);
+    }
+  }
+
+  function selectAnswer(e) {
+    const selectedBtn = e.target;
+    const isCorrect = selectedBtn.dataset.correct === "true";
+    if (isCorrect) {
+      selectedBtn.style.backgroundColor = "#28a745";
+      score++;
+    } else {
+      selectedBtn.style.backgroundColor = "#dc3545";
+    }
+
+    Array.from(answerButtons.children).forEach(button => {
+      button.disabled = true;
+      if (button.dataset.correct === "true") {
+        button.style.backgroundColor = "#28a745";
+      }
+    });
+
+    nextButton.style.display = "block";
+  }
+
+  function showScore() {
+    resetState();
+    questionElement.innerHTML = `You scored ${score} out of ${questions.length}!`;
+    nextButton.innerHTML = "Play Again";
+    nextButton.style.display = "block";
+  }
+
+  function handleNextButton() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < questions.length) {
+      showQuestion();
+    } else {
+      showScore();
+    }
+  }
+
+  nextButton.addEventListener("click", () => {
+    if (currentQuestionIndex < questions.length) {
+      handleNextButton();
+    } else {
+      startQuiz();
+    }
+  });
+
+  startQuiz();
+</script>
+
+</body>
+</html>
